@@ -1,18 +1,25 @@
-const NodeRSA = require("node-rsa");
-const fs = require("fs");
+const { generateKeyPairSync } = require("crypto");
+const { writeFile } = require("fs");
 
-(() => {
-  const key = new NodeRSA().generateKeyPair();
+const { privateKey, publicKey } = generateKeyPairSync("rsa", {
+  modulusLength: 2048, // the length of your key in bits
+  publicKeyEncoding: {
+    type: "spki" /** recommended to be 'spki' by the Node.js docs */,
+    format: "pem",
+  },
+  privateKeyEncoding: {
+    type: "pkcs8" /** recommended to be 'pkcs8' by the Node.js docs */,
+    format: "pem",
+  },
+});
 
-  const publicKey = key.exportKey("public");
-  const privateKey = key.exportKey("private");
-
-  fs.writeFile("./keys/public-key.pem", publicKey, "utf-8", (err) =>
+/** Generates public and private keys*/
+const create_key = (privateKey, publicKey) => {
+  writeFile("./keys/public.pem", publicKey, "utf-8", (err) =>
     err ? console.log(err) : undefined
   );
-
-  fs.writeFile("./keys/private-key.pem", privateKey, "utf-8", (err) =>
+  writeFile("./keys/private.pem", privateKey, "utf-8", (err) =>
     err ? console.log(err) : undefined
   );
-  console.log("I will run first");
-})();
+};
+create_key(privateKey, publicKey);
